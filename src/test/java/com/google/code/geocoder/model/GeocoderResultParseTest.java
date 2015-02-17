@@ -4,12 +4,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class GeocoderResultParseTest extends Assert {
 
@@ -45,8 +43,9 @@ public class GeocoderResultParseTest extends Assert {
 
 	private void assertParsedResponse(String filename, GeocodeResponse expected) throws Exception {
 		InputStreamReader file = new InputStreamReader(new FileInputStream(filename), "UTF-8");
-		final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-		GeocodeResponse response = gson.fromJson(file, GeocodeResponse.class);
+		final ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		GeocodeResponse response = objectMapper.readValue(file, GeocodeResponse.class);
 		assertNotNull(response);
 		assertEquals(expected, response);
 	}

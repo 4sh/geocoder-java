@@ -1,10 +1,9 @@
 package com.google.code.geocoder;
 
 import com.google.code.geocoder.model.*;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.binary.Base64;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +28,11 @@ public class Geocoder {
     private static final String GEOCODE_REQUEST_SERVER_HTTPS = "https://" + GEOCODE_REQUEST_HOST;
     private static final String GEOCODE_REQUEST_QUERY_BASIC = "/maps/api/geocode/json?sensor=false";
     private static final String ENCODING = "UTF-8";
+
+    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    static {
+        OBJECT_MAPPER.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     private final String clientId;
     private final Mac mac;
@@ -64,18 +68,16 @@ public class Geocoder {
 
     public GeocodeResponse geocode(final GeocoderRequest geocoderRequest) throws IOException {
 
-        final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-
         final String urlString = getURL(geocoderRequest);
 
-        return request(gson, urlString);
+        return request(urlString);
     }
 
-    protected GeocodeResponse request(Gson gson, String urlString) throws IOException {
+    protected GeocodeResponse request(String urlString) throws IOException {
         final URL url = new URL(urlString);
         final Reader reader = new BufferedReader(new InputStreamReader(url.openStream(), ENCODING));
         try {
-            return gson.fromJson(reader, GeocodeResponse.class);
+            return OBJECT_MAPPER.readValue(reader, GeocodeResponse.class);
         } finally {
             reader.close();
         }

@@ -1,7 +1,6 @@
 package com.google.code.geocoder;
 
 import com.google.code.geocoder.model.GeocodeResponse;
-import com.google.gson.Gson;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -43,13 +42,14 @@ public class AdvancedGeoCoder extends Geocoder {
                 null, httpClient);
     }
 
-    protected GeocodeResponse request(final Gson gson, final String urlString) throws IOException {
+    @Override
+    protected GeocodeResponse request(final String urlString) throws IOException {
         final GetMethod getMethod = new GetMethod(urlString);
         try {
             httpClient.executeMethod(getMethod);
             final Reader reader = new InputStreamReader(getMethod.getResponseBodyAsStream(), getMethod.getResponseCharSet());
 
-            return gson.fromJson(reader, GeocodeResponse.class);
+            return OBJECT_MAPPER.readValue(reader, GeocodeResponse.class);
         } finally {
             getMethod.releaseConnection();
         }
