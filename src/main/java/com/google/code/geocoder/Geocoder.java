@@ -34,22 +34,26 @@ public class Geocoder {
     private final Mac mac;
 
     public Geocoder() {
-        clientId = null;
-        mac = null;
+        this(null,null);
     }
 
-    public Geocoder(final String clientId, final String clientKey) throws InvalidKeyException {
-        if (clientId == null || clientId.length() == 0) {
-            throw new IllegalArgumentException("ClientId is not defined");
-        }
-        if (clientKey == null || clientKey.length() == 0) {
-            throw new IllegalArgumentException("ClientKey is not defined");
-        }
-
+    protected Geocoder(String clientId, Mac mac) {
         this.clientId = clientId;
-        this.mac = getMAC(clientKey);
+        this.mac = mac;
     }
 
+    public static Geocoder createFromClientId(String clientId, String clientKey) throws InvalidKeyException {
+        return new Geocoder(
+                checkNotNullOrEmpty(clientId, "clientId"),
+                getMAC(checkNotNullOrEmpty(clientKey, "clientKey")));
+    }
+
+    protected static String checkNotNullOrEmpty(String value, String fieldName) {
+        if (value == null || value.length() == 0) {
+            throw new IllegalArgumentException(fieldName+" is not defined");
+        }
+        return value;
+    }
 
     public GeocodeResponse geocode(final GeocoderRequest geocoderRequest) throws IOException {
 

@@ -9,12 +9,12 @@ public class GeocoderTest extends BaseGeocoderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreationClientIdFail() throws Exception {
-        new Geocoder("someClientId", "");
+        Geocoder.createFromClientId("someClientId", "");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreationClientKeyFail() throws Exception {
-        new Geocoder("", "someClientKey");
+        Geocoder.createFromClientId("", "someClientKey");
     }
 
     @Test

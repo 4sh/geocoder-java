@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 
+import javax.crypto.Mac;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -25,14 +26,21 @@ public class AdvancedGeoCoder extends Geocoder {
         this(new HttpClient(new MultiThreadedHttpConnectionManager()));
     }
 
-    public AdvancedGeoCoder(final String clientId, final String clientKey) throws InvalidKeyException {
-        super(clientId, clientKey);
-        httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+    protected AdvancedGeoCoder(String clientId, Mac mac, HttpClient httpClient) {
+        super(clientId, mac);
+        this.httpClient = httpClient;
     }
 
-    public AdvancedGeoCoder(final HttpClient httpClient, final String clientId, final String clientKey) throws InvalidKeyException {
-        super(clientId, clientKey);
-        this.httpClient = httpClient;
+    public static AdvancedGeoCoder createFromClientId(String clientId, String clientKey) throws InvalidKeyException {
+        return createFromClientId(clientId, clientKey,
+                new HttpClient(new MultiThreadedHttpConnectionManager()));
+    }
+
+    public static AdvancedGeoCoder createFromClientId(String clientId, String clientKey, HttpClient httpClient) throws InvalidKeyException {
+        return new AdvancedGeoCoder(
+                checkNotNullOrEmpty(clientId, "clientId"),
+                getMAC(checkNotNullOrEmpty(clientKey, "clientKey")),
+                httpClient);
     }
 
     protected GeocodeResponse request(final Gson gson, final String urlString) throws IOException {
