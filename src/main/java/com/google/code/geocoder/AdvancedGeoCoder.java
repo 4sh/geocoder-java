@@ -26,8 +26,8 @@ public class AdvancedGeoCoder extends Geocoder {
         this(new HttpClient(new MultiThreadedHttpConnectionManager()));
     }
 
-    protected AdvancedGeoCoder(String clientId, Mac mac, HttpClient httpClient) {
-        super(clientId, mac);
+    protected AdvancedGeoCoder(String clientId, Mac mac, String apiKey, HttpClient httpClient) {
+        super(clientId, mac, apiKey);
         this.httpClient = httpClient;
     }
 
@@ -40,7 +40,7 @@ public class AdvancedGeoCoder extends Geocoder {
         return new AdvancedGeoCoder(
                 checkNotNullOrEmpty(clientId, "clientId"),
                 getMAC(checkNotNullOrEmpty(clientKey, "clientKey")),
-                httpClient);
+                null, httpClient);
     }
 
     protected GeocodeResponse request(final Gson gson, final String urlString) throws IOException {

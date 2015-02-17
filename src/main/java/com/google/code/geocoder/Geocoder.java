@@ -32,20 +32,27 @@ public class Geocoder {
 
     private final String clientId;
     private final Mac mac;
+    private final String apiKey;
 
     public Geocoder() {
-        this(null,null);
+        this(null,null,null);
     }
 
-    protected Geocoder(String clientId, Mac mac) {
+    protected Geocoder(String clientId, Mac mac, String apiKey) {
         this.clientId = clientId;
         this.mac = mac;
+        this.apiKey = apiKey;
+    }
+
+    public static Geocoder createFromApiKey(String apiKey) {
+        return new Geocoder(null,null,apiKey);
     }
 
     public static Geocoder createFromClientId(String clientId, String clientKey) throws InvalidKeyException {
         return new Geocoder(
                 checkNotNullOrEmpty(clientId, "clientId"),
-                getMAC(checkNotNullOrEmpty(clientKey, "clientKey")));
+                getMAC(checkNotNullOrEmpty(clientKey, "clientKey")),
+                null);
     }
 
     protected static String checkNotNullOrEmpty(String value, String fieldName) {
@@ -62,7 +69,6 @@ public class Geocoder {
         final String urlString = getURL(geocoderRequest);
 
         return request(gson, urlString);
-
     }
 
     protected GeocodeResponse request(Gson gson, String urlString) throws IOException {
@@ -107,6 +113,10 @@ public class Geocoder {
         final EnumMap<GeocoderComponent, String> components = geocoderRequest.getComponents();
 
         final StringBuilder url = new StringBuilder(GEOCODE_REQUEST_QUERY_BASIC);
+
+        if(apiKey != null) {
+            url.append("&key=").append(URLEncoder.encode(apiKey, ENCODING));
+        }
 
         if (channel != null && channel.length() > 0) {
             url.append("&channel=").append(URLEncoder.encode(channel, ENCODING));
