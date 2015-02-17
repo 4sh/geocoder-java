@@ -91,13 +91,13 @@ public class Geocoder {
         logger.trace("Request {}", geocoderRequest);
         final StringBuilder url = getURLQuery(geocoderRequest);
 
-        if (mac == null) {
-            // add server name to URL
+        if(mac != null) {
+            addClientIdAndSignURL(url);
+        }
+
+        if(mac == null && apiKey == null) {
             url.insert(0, GEOCODE_REQUEST_SERVER_HTTP);
         } else {
-            addClientIdAndSignURL(url);
-
-            // add server name to URL
             url.insert(0, GEOCODE_REQUEST_SERVER_HTTPS);
         }
 
